@@ -179,7 +179,6 @@ def mnist_fashion(layers,  # pylint: disable=invalid-name
                   batch_size=128,
                   mode="train"):
   """Mnist Fashion classification with a multi-layer perceptron."""
-  print('====================================================================================')
   if activation == "sigmoid":
     activation_op = tf.sigmoid
   elif activation == "relu":
