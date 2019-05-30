@@ -33,7 +33,6 @@ import preprocess
 
 def factory(net, net_options=(), net_path=None):
   """Network factory."""
-
   net_class = getattr(sys.modules[__name__], net)
   net_options = dict(net_options)
 

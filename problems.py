@@ -26,6 +26,7 @@ from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import sonnet as snt
 import tensorflow as tf
+from tensorflow import keras
 
 from tensorflow.contrib.learn.python.learn.datasets import mnist as mnist_dataset
 
@@ -166,6 +167,49 @@ def mnist(layers,  # pylint: disable=invalid-name
 
   def build():
     indices = tf.random_uniform([batch_size], 0, data.num_examples, tf.int64)
+    batch_images = tf.gather(images, indices)
+    batch_labels = tf.gather(labels, indices)
+    output = network(batch_images)
+    return _xent_loss(output, batch_labels)
+
+  return build
+
+def mnist_fashion(layers,  # pylint: disable=invalid-name
+                  activation="sigmoid",
+                  batch_size=128,
+                  mode="train"):
+  """Mnist Fashion classification with a multi-layer perceptron."""
+  print('====================================================================================')
+  if activation == "sigmoid":
+    activation_op = tf.sigmoid
+  elif activation == "relu":
+    activation_op = tf.nn.relu
+  else:
+    raise ValueError("{} activation not supported".format(activation))
+
+  # Data.
+  mnist_fashion = keras.datasets.fashion_mnist 
+  images, labels = None, None
+
+  if mode == 'train':
+    (images, labels), _ = mnist_fashion.load_data()
+  else:
+    _, (images, labels) = mnist_fashion.load_data()
+
+  num_examples = len(images)
+  
+  images = tf.constant(images, dtype=tf.float32, name="MNIST_fashion_images")
+  images = tf.reshape(images, [-1, 28, 28, 1])
+  labels = tf.constant(labels, dtype=tf.int64, name="MNIST_fashion_labels")
+
+  # Network.
+  mlp = snt.nets.MLP(list(layers) + [10],
+                     activation=activation_op,
+                     initializers=_nn_initializers)
+  network = snt.Sequential([snt.BatchFlatten(), mlp])
+
+  def build():
+    indices = tf.random_uniform([batch_size], 0, num_examples, tf.int64)
     batch_images = tf.gather(images, indices)
     batch_labels = tf.gather(labels, indices)
     output = network(batch_images)

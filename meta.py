@@ -301,10 +301,6 @@ class MetaOptimizer(object):
         net = nets[key]
         with tf.name_scope("state_{}".format(i)):
           state.append([net.initial_state_for_inputs(x[j], dtype=tf.float32) for j in subset])
-          #state.append(_nested_variable(
-          #    [net.initial_state_for_inputs(x[j], dtype=tf.float32)
-          #     for j in subset],
-          #    name="state", trainable=False))
 
     def update(net, fx, x, state):
       """Parameter and RNN state update."""
@@ -377,8 +373,6 @@ class MetaOptimizer(object):
     
     with tf.name_scope("update"):
       update = (nest.flatten(_nested_assign(x, x_final)) + nest.flatten(_nested_assign(_nested_variable(state), s_final)))
-      #update = (nest.flatten(_nested_assign(x, x_final)) +
-      #          nest.flatten(_nested_assign(state, s_final)))
 
     # Log internal variables.
     for k, net in nets.items():
